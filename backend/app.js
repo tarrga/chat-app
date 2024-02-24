@@ -3,6 +3,7 @@ import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import 'dotenv/config';
+import userRoute from './routes/userRoute.js';
 
 const app = express();
 const server = createServer(app);
@@ -23,6 +24,9 @@ io.on('connection', socket => {
     console.log(`user ${socket.id} disconnected`);
   });
 });
+
+//routes
+app.use('/users/register', userRoute);
 
 server.listen(process.env.PORT, () => {
   console.log(`Listening on port ${process.env.PORT}`);

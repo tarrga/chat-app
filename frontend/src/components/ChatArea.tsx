@@ -7,12 +7,11 @@ export default function ChatArea() {
 
   return (
     <div className=' w-3/4 bg-blue-400 bg-[url("/src/assets/images/bg.png")] p-10 flex flex-col justify-end'>
-      <div>Chats</div>
       <ul className='flex flex-col'>
         {messages.map((msg, idx) => (
           <li
             className={`text-gray-800 max-w-md mt-2 px-3 py-1 pb-6 rounded-xl relative bg-white flex min-w-16 ${
-              user === msg.user ? 'self-end bg-green-500' : 'self-start'
+              user === msg.user ? 'self-end bg-green-400' : 'self-start'
             }`}
             key={idx}
           >

@@ -45,7 +45,7 @@ export default function InputBar() {
       <input
         type='submit'
         value=''
-        className='translate-y-3 bg-cover bg-no-repeat bg-center w-6 h-6 cursor-pointer absolute right-6 top-0 bg-[url("/src/assets/images/icons/send-icon.png")]'
+        className='active:w-5 active:h-5 active:right-7 transition-all bg-cover bg-no-repeat bg-center w-6 h-6 cursor-pointer absolute right-6 top-1/2 -translate-y-1/2 bg-[url("/src/assets/images/icons/send-icon.png")]'
       />
     </form>
   );

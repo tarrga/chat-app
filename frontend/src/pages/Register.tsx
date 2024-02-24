@@ -8,20 +8,40 @@ export default function Login() {
   const dispatch = useAppDispatch();
   const username = useRef<HTMLInputElement>(null);
   const password = useRef<HTMLInputElement>(null);
+  const rePassword = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<null | string>(null);
   const user = useAppSelector(state => state.user);
 
-  const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
-    console.log('submit');
+  const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null);
-    // fetch
-    dispatch(setUsername('Miki'));
+    const res = await fetch(`${import.meta.env.VITE_BACKEND_URI}/users/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: username.current?.value,
+        password: password.current?.value,
+        rePassword: rePassword.current?.value,
+      }),
+    });
+    const data = res.json();
+    return data;
 
+    setError(null);
+    if (username.current?.value.length < 3) {
+      setError('Username must be at least 3 characters');
+      return;
+    }
+    if (password.current?.value.length < 8) {
+      setError('Password must be at least 8 characters');
+      return;
+    }
     if (username.current?.value) {
       dispatch(setUsername(username.current?.value));
     }
   };
+
   return (
     <>
       {user.username && <Navigate to='/' replace={true} />}
@@ -33,14 +53,16 @@ export default function Login() {
         </div>
         <form className='w-full flex flex-col justify-center items-center mt-12' onSubmit={submitHandler}>
           <input ref={username} className='w-full py-3 px-5 text-gray-800 bg-white shadow-md rounded-lg' type='text' placeholder='Username' />
+
           <input ref={password} className='w-full mt-4 py-3 px-5 text-gray-800 bg-white shadow-md rounded-lg' type='password' placeholder='Password' />
+          <input ref={rePassword} className='w-full mt-4 py-3 px-5 text-gray-800 bg-white shadow-md rounded-lg' type='password' placeholder='Verify Password' />
           <input className='mt-4 bg-blue-600 w-full p-3 shadow-md rounded-lg' type='submit' value='Sign Up' />
           {error && <span className='text-red-500 mt-3 font-bold'>{error}</span>}
         </form>
         <div className='font-bold mt-3'>
-          Don't have an account?{' '}
-          <Link className='text-blue-400' to='/sign-up'>
-            Sign Up!
+          Already have an account?{' '}
+          <Link className='text-blue-400' to='/login'>
+            Log In!
           </Link>
         </div>
       </div>
