@@ -14,10 +14,13 @@ export const usersSlice = createSlice({
     addUser: (state, action: PayloadAction<User>) => {
       state.users = [...state.users, action.payload];
     },
+    addUsers: (state, action: PayloadAction<User[]>) => {
+      state.users = action.payload;
+    },
   },
 });
 
-export const { addUser } = usersSlice.actions;
+export const { addUser, addUsers } = usersSlice.actions;
 
 export const selectUsers = (state: RootState) => state.users;
 

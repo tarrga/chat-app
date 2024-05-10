@@ -1,11 +1,9 @@
 import { useRef, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../hooks/hooks';
-import { setUsername } from '../store/userSlice';
+import { useAppSelector } from '../hooks/hooks';
 import { IoChatbubbleEllipsesOutline } from 'react-icons/io5';
 import { Link, Navigate } from 'react-router-dom';
 
 export default function Login() {
-  const dispatch = useAppDispatch();
   const username = useRef<HTMLInputElement>(null);
   const password = useRef<HTMLInputElement>(null);
   const rePassword = useRef<HTMLInputElement>(null);
@@ -14,31 +12,39 @@ export default function Login() {
 
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const res = await fetch(`${import.meta.env.VITE_BACKEND_URI}/users/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: username.current?.value,
-        password: password.current?.value,
-        rePassword: rePassword.current?.value,
-      }),
-    });
-    const data = res.json();
-    return data;
-
     setError(null);
-    if (username.current?.value.length < 3) {
-      setError('Username must be at least 3 characters');
-      return;
-    }
-    if (password.current?.value.length < 8) {
-      setError('Password must be at least 8 characters');
-      return;
-    }
-    if (username.current?.value) {
-      dispatch(setUsername(username.current?.value));
+    // if (username.current?.value.length < 3) {
+    //   setError('Username must be at least 3 characters');
+    //   return;
+    // }
+    // if (password.current?.value.length < 8) {
+    //   setError('Password must be at least 8 characters');
+    //   return;
+    // }
+    // if (password.current?.value !== rePassword.current?.value) {
+    //   setError('Passwords do not match');
+    //   return;
+    // }
+
+    try {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URI}/users/register`, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username.current?.value,
+          password: password.current?.value,
+          rePassword: rePassword.current?.value,
+        }),
+      });
+      const data = await res.json();
+      if (data.error) {
+        throw Error(data.error);
+      }
+    } catch (err) {
+      setError(err.message);
     }
   };
 

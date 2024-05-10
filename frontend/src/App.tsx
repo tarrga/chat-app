@@ -18,7 +18,7 @@ function App() {
   }
 
   return (
-    <div className='bg-gray-800 min-h-dvh flex justify-center flex-row mx-auto py-40 px-36'>
+    <div className='bg-gray-800 min-h-dvh flex justify-center flex-row mx-auto py-24 px-36'>
       <Router>
         <Routes>
           <Route element={<ProtectedRoute user={username} redirectPath='/login' />}>

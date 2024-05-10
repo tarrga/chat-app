@@ -5,7 +5,8 @@ import { User } from '../types';
 
 const initialState: User = {
   username: null,
-  userId: null,
+  id: null,
+  receiverId: null,
 };
 
 export const userSlice = createSlice({
@@ -15,13 +16,16 @@ export const userSlice = createSlice({
     setUsername: (state, action: PayloadAction<string>) => {
       state.username = action.payload;
     },
-    setUserId: (state, action: PayloadAction<string>) => {
-      state.username = action.payload;
+    setUserId: (state, action: PayloadAction<number>) => {
+      state.id = action.payload;
+    },
+    setReceiverId: (state, action: PayloadAction<number>) => {
+      state.receiverId = action.payload;
     },
   },
 });
 
-export const { setUsername, setUserId } = userSlice.actions;
+export const { setUsername, setUserId, setReceiverId } = userSlice.actions;
 
 export const selectUser = (state: RootState) => state.user;
 

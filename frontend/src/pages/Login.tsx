@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks/hooks';
-import { setUsername } from '../store/userSlice';
+import { setUserId, setUsername } from '../store/userSlice';
+import { addUsers } from '../store/usersSlice';
 import { IoChatbubbleEllipsesOutline } from 'react-icons/io5';
 import { Link, Navigate } from 'react-router-dom';
 
@@ -11,15 +12,35 @@ export default function Login() {
   const [error, setError] = useState<null | string>(null);
   const user = useAppSelector(state => state.user);
 
-  const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
-    console.log('submit');
+  const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     // fetch
-    dispatch(setUsername('Miki'));
+    try {
+      const res = await fetch('/api/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username.current?.value || 'gabor',
+          password: password.current?.value || '1234',
+        }),
+      });
+      const data = await res.json();
+      console.log();
 
-    if (username.current?.value) {
-      dispatch(setUsername(username.current?.value));
+      if (data.error) {
+        throw Error(data.error);
+      }
+
+      dispatch(setUsername(data.user.username));
+      dispatch(setUserId(data.user.userId));
+      console.log(data);
+
+      dispatch(addUsers(data.users));
+    } catch (err) {
+      setError(err?.message);
     }
   };
   return (
@@ -34,7 +55,7 @@ export default function Login() {
         <form className='w-full flex flex-col justify-center items-center mt-12' onSubmit={submitHandler}>
           <input ref={username} className='w-full py-3 px-5 text-gray-800 bg-white shadow-md rounded-lg' type='text' placeholder='Username' />
           <input ref={password} className='w-full mt-4 py-3 px-5 text-gray-800 bg-white shadow-md rounded-lg' type='password' placeholder='Password' />
-          <input className='mt-4 bg-blue-600 w-full p-3 shadow-md rounded-lg' type='submit' value='Sign Up' />
+          <input className='mt-4 bg-blue-600 w-full p-3 shadow-md rounded-lg' type='submit' value='Log In' />
           {error && <span className='text-red-500 mt-3 font-bold'>{error}</span>}
         </form>
         <div className='font-bold mt-3'>
