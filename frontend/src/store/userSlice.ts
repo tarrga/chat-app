@@ -6,26 +6,24 @@ import { User } from '../types';
 const initialState: User = {
   username: null,
   id: null,
-  receiverId: null,
+  socketId: null,
+  profilePicturePath: null,
 };
 
 export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setUsername: (state, action: PayloadAction<string>) => {
-      state.username = action.payload;
+    setUser: (state, action: PayloadAction<User>) => {
+      return { ...action.payload };
     },
-    setUserId: (state, action: PayloadAction<number>) => {
-      state.id = action.payload;
-    },
-    setReceiverId: (state, action: PayloadAction<number>) => {
-      state.receiverId = action.payload;
+    updateProfilePicturePath: (state, action: PayloadAction<string>) => {
+      state.profilePicturePath = action.payload;
     },
   },
 });
 
-export const { setUsername, setUserId, setReceiverId } = userSlice.actions;
+export const { setUser, updateProfilePicturePath } = userSlice.actions;
 
 export const selectUser = (state: RootState) => state.user;
 

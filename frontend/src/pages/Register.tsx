@@ -13,6 +13,8 @@ export default function Login() {
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
+    console.log(`${import.meta.env.VITE_BACKEND_URI}/users/register`);
+
     // if (username.current?.value.length < 3) {
     //   setError('Username must be at least 3 characters');
     //   return;
@@ -27,7 +29,7 @@ export default function Login() {
     // }
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URI}/users/register`, {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URI}/api/users/register`, {
         method: 'POST',
         credentials: 'same-origin',
         headers: {

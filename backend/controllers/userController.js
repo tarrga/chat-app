@@ -1,12 +1,15 @@
 import sqlite3 from 'sqlite3';
 import bcrypt from 'bcryptjs';
 import generateTokenAndSetCookie from '../utils/generateToken.js';
+import { unlink } from 'node:fs';
 
 const sqlite = sqlite3.verbose();
 const db = new sqlite3.cached.Database('./model/app.db', sqlite3.OPEN_READWRITE, err => {
   if (err) return console.error(err.message);
 });
 let sql;
+
+const connectedUsers = [];
 
 const getConversationId = (userOneId, userTwoId) => {
   const conversationId = [];
@@ -54,7 +57,7 @@ const getMessages = id => {
 const getUsers = id => {
   const users = [];
   return new Promise((resolve, reject) => {
-    const sql = `SELECT username, id FROM user WHERE id NOT LIKE '${id}'`;
+    const sql = `SELECT username, id, socketId FROM user WHERE id NOT LIKE '${id}'`;
     db.all(sql, [], (err, rows) => {
       if (err) return console.error(err.message);
       rows.forEach(row => {
@@ -68,7 +71,22 @@ const getUsers = id => {
 const getUser = username => {
   let users = [];
   return new Promise((resolve, reject) => {
-    const sql = `SELECT username, password, id FROM user WHERE username LIKE '${username}'`;
+    const sql = `SELECT username, password, id, profilePicturePath FROM user WHERE username LIKE '${username}'`;
+    db.all(sql, [], (err, rows) => {
+      if (err) return console.error(err.message);
+      rows.forEach(row => {
+        if (err) return console.error(err.message);
+        users.push(row);
+      });
+      resolve(users);
+    });
+  });
+};
+
+const getUserById = id => {
+  let users = [];
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT username, password, id, profilePicturePath FROM user WHERE id LIKE '${id}'`;
     db.all(sql, [], (err, rows) => {
       if (err) return console.error(err.message);
       rows.forEach(row => {
@@ -81,6 +99,7 @@ const getUser = username => {
 };
 
 const registerUser = async (req, res) => {
+  console.log('hello register');
   const { username, password, rePassword } = req.body;
   const passwordMatch = password === rePassword;
   // check for password match
@@ -116,7 +135,7 @@ const loginUser = async (req, res) => {
   generateTokenAndSetCookie(userId, res);
   const messages = await getMessages(userId);
   const users = await getUsers(userId);
-  return res.json({ user: { username, userId }, users, messages });
+  return res.json({ user: { username, id: userId, profilePicturePath: userArr[0].profilePicturePath }, users, messages });
   // if (!isUser) {
   //   res.json({ error: 'Wrong Credentials' });
   // }
@@ -131,4 +150,19 @@ const logout = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, getUserId, getConversationId, logout };
+const updateUser = async (req, res) => {
+  if (!req.file) return;
+  console.log('user update');
+  const userArr = await getUserById(req.id);
+  unlink(`./public/profile_pictures/${userArr[0].profilePicturePath}`, err => {
+    if (err) console.log(err);
+    console.log(userArr[0].profilePicturePath + ' image is deleted');
+  });
+  sql = `UPDATE user SET profilePicturePath = ? WHERE id = ?`;
+  db.run(sql, [`${req.file.filename}`, req.id], err => {
+    if (err) return console.error(err.message);
+  });
+  return res.json({ ok: true, profilePicturePath: req.file.filename });
+};
+
+export { registerUser, loginUser, getUserId, getConversationId, logout, updateUser };

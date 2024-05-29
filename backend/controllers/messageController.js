@@ -10,6 +10,8 @@ let sql;
 const sendMessage = async (req, res) => {
   console.log(req.cookies.jwt);
   console.log(req.body);
+
+  return;
   try {
     const { message, date } = req.body;
     const { id: receiverId } = req.params;

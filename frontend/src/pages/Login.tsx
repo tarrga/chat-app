@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks/hooks';
-import { setUserId, setUsername } from '../store/userSlice';
+import { setUser } from '../store/userSlice';
 import { addUsers } from '../store/usersSlice';
 import { IoChatbubbleEllipsesOutline } from 'react-icons/io5';
 import { Link, Navigate } from 'react-router-dom';
+import { socket } from '../helper/socket';
 
 export default function Login() {
   const dispatch = useAppDispatch();
@@ -11,6 +12,7 @@ export default function Login() {
   const password = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<null | string>(null);
   const user = useAppSelector(state => state.user);
+  const users = useAppSelector(state => state.users);
 
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -23,22 +25,27 @@ export default function Login() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: username.current?.value || 'gabor',
-          password: password.current?.value || '1234',
+          username: username.current?.value || 'luigi',
+          password: password.current?.value || '123456',
         }),
       });
       const data = await res.json();
-      console.log();
+      console.log(data.users);
+      console.log(data.user);
 
       if (data.error) {
         throw Error(data.error);
       }
+      // console.log(socket.id);
+      console.log(data.user);
 
-      dispatch(setUsername(data.user.username));
-      dispatch(setUserId(data.user.userId));
-      console.log(data);
+      socket.emit('log_in', { username: data.user.username, id: data.user.id });
+
+      dispatch(setUser(data.user));
+      console.log(data.users);
 
       dispatch(addUsers(data.users));
+      console.log(users);
     } catch (err) {
       setError(err?.message);
     }

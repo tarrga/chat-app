@@ -10,8 +10,6 @@ export const messagesSlice = createSlice({
   initialState,
   reducers: {
     addMessage: (state, action: PayloadAction<Message>) => {
-      console.log(action.payload);
-
       state.push(action.payload);
     },
   },
